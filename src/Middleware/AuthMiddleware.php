@@ -1,0 +1,73 @@
+<?php
+declare(strict_types=1);
+
+namespace App\Middleware;
+
+use App\Auth;
+use App\Discord;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use Slim\Psr7\Response;
+
+class AuthMiddleware implements MiddlewareInterface
+{
+    public function __construct(
+        private Auth    $auth,
+        private Discord $discord
+    ) {}
+
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    {
+        $cookies      = $request->getCookieParams();
+        $sessionToken = $cookies['session_token'] ?? null;
+
+        if (!$sessionToken) {
+            return $this->redirect('/');
+        }
+
+        $session = $this->auth->loadSession($sessionToken);
+        if (!$session) {
+            return $this->redirect('/');
+        }
+
+        // Access Token erneuern wenn < 1 Stunde Restlaufzeit
+        if (strtotime($session['access_token_expires_at']) < time() + 3600) {
+            if (!$this->auth->refreshAccessToken($sessionToken, $this->discord)) {
+                $this->auth->destroySession($sessionToken);
+                return $this->redirect('/');
+            }
+            $session = $this->auth->loadSession($sessionToken);
+        }
+
+        $this->auth->touchSession($sessionToken);
+
+        // CSRF-Check für alle nicht-GET Requests
+        if (!in_array($request->getMethod(), ['GET', 'HEAD', 'OPTIONS'], true)) {
+            $expected = $this->auth->getCsrfToken($sessionToken);
+            // Header hat Vorrang (AJAX), dann Form-Body
+            $received = $request->getHeaderLine('X-CSRF-Token')
+                ?: (((array)$request->getParsedBody())['csrf_token'] ?? '');
+
+            if (!hash_equals($expected, $received)) {
+                $res = new Response();
+                $res->getBody()->write(json_encode(['error' => 'CSRF-Validierung fehlgeschlagen']));
+                return $res->withStatus(403)->withHeader('Content-Type', 'application/json');
+            }
+        }
+
+        return $handler->handle(
+            $request
+                ->withAttribute('session', $session)
+                ->withAttribute('session_token', $sessionToken)
+                ->withAttribute('csrf_token', $this->auth->getCsrfToken($sessionToken))
+                ->withAttribute('is_superadmin', $this->auth->isSuperAdmin($session['discord_user_id']))
+        );
+    }
+
+    private function redirect(string $url): ResponseInterface
+    {
+        return (new Response())->withHeader('Location', $url)->withStatus(302);
+    }
+}
