@@ -39,18 +39,22 @@ class AuthMiddleware implements MiddlewareInterface
                 return $this->redirect('/');
             }
             $session = $this->auth->loadSession($sessionToken);
+            if (!$session) {
+                return $this->redirect('/');
+            }
         }
 
         $this->auth->touchSession($sessionToken);
 
+        $csrfToken = $this->auth->getCsrfToken($sessionToken);
+
         // CSRF-Check für alle nicht-GET Requests
         if (!in_array($request->getMethod(), ['GET', 'HEAD', 'OPTIONS'], true)) {
-            $expected = $this->auth->getCsrfToken($sessionToken);
             // Header hat Vorrang (AJAX), dann Form-Body
             $received = $request->getHeaderLine('X-CSRF-Token')
                 ?: (((array)$request->getParsedBody())['csrf_token'] ?? '');
 
-            if (!hash_equals($expected, $received)) {
+            if (!hash_equals($csrfToken, $received)) {
                 $res = new Response();
                 $res->getBody()->write(json_encode(['error' => 'CSRF-Validierung fehlgeschlagen']));
                 return $res->withStatus(403)->withHeader('Content-Type', 'application/json');
@@ -61,7 +65,7 @@ class AuthMiddleware implements MiddlewareInterface
             $request
                 ->withAttribute('session', $session)
                 ->withAttribute('session_token', $sessionToken)
-                ->withAttribute('csrf_token', $this->auth->getCsrfToken($sessionToken))
+                ->withAttribute('csrf_token', $csrfToken)
                 ->withAttribute('is_superadmin', $this->auth->isSuperAdmin($session['discord_user_id']))
         );
     }
