@@ -43,7 +43,7 @@ async function botCmd(command) {
         <h3><?= htmlspecialchars($ch['guild_name'] ?? 'Unbekannter Server', ENT_QUOTES) ?></h3>
         <div class="meta">
             #<?= htmlspecialchars($ch['channel_name'] ?? $ch['channel_id'], ENT_QUOTES) ?>
-            · <?= (int)$ch['feed_count'] ?> Feeds
+            · <?= htmlspecialchars((string)$ch['feed_count'], ENT_QUOTES) ?> Feeds
             · <?= $ch['last_digest_at']
                 ? 'Letzter Digest: ' . htmlspecialchars(date('d.m.Y H:i', strtotime($ch['last_digest_at'])), ENT_QUOTES)
                 : 'Noch kein Digest' ?>

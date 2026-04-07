@@ -22,11 +22,11 @@ class DashboardAction
 
         $channels = $this->db->fetchAll(
             'SELECT c.*,
-                    COUNT(DISTINCT CASE WHEN cf.active = 1 THEN cf.id END) AS feed_count,
+                    COUNT(DISTINCT cf.id) AS feed_count,
                     MAX(dt.created_at) AS last_digest_at
              FROM channels c
              LEFT JOIN channel_categories cc ON cc.channel_id = c.channel_id AND cc.active = 1
-             LEFT JOIN channel_feeds cf       ON cf.category_id = cc.id
+             LEFT JOIN channel_feeds cf       ON cf.category_id = cc.id AND cf.active = 1
              LEFT JOIN daily_threads dt       ON dt.channel_id = c.channel_id
              WHERE c.owner_user_id = ? AND c.active = 1
              GROUP BY c.channel_id
