@@ -37,10 +37,6 @@ class CallbackAction
             return $response->withHeader('Location', '/')->withStatus(302);
         }
 
-        // Guilds abrufen — Admin-Check via permissions Bitmaske
-        $guilds      = $this->discord->getUserGuilds($tokens['access_token']);
-        $adminGuilds = array_filter($guilds, fn($g) => ((int)($g['permissions'] ?? 0) & 0x8) !== 0);
-
         // Session anlegen
         $sessionToken = $this->auth->createSession(
             $user['id'],
@@ -55,7 +51,7 @@ class CallbackAction
             $sessionToken,
             60 * 60 * 24 * 7
         );
-        $clearState = 'oauth_state=; Path=/auth/callback; HttpOnly; Max-Age=0';
+        $clearState = 'oauth_state=; Path=/auth/callback; HttpOnly; SameSite=Lax; Max-Age=0';
 
         return $response
             ->withAddedHeader('Set-Cookie', $sessionCookie)
