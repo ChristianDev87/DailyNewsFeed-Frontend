@@ -23,6 +23,9 @@ class FeedValidator
         }
 
         $ip = gethostbyname($host);
+        if ($ip === $host) {
+            return ['valid' => false, 'error' => 'Host nicht auflösbar'];
+        }
         if (self::isPrivateIp($ip)) {
             return ['valid' => false, 'error' => 'Private IP-Adressen sind nicht erlaubt'];
         }

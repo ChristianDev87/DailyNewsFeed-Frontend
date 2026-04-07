@@ -29,6 +29,12 @@ class FeedValidatorTest extends TestCase
         $this->assertStringContainsString('HTTP/HTTPS', $result['error']);
     }
 
+    public function testRejectsUnresolvableHost(): void
+    {
+        $result = $this->v->validateUrl('https://this-host-does-not-exist-xyz-12345.invalid/feed.xml');
+        $this->assertFalse($result['valid']);
+    }
+
     public function testIsPrivateIpLoopback(): void
     {
         $this->assertTrue(FeedValidator::isPrivateIp('127.0.0.1'));
