@@ -47,7 +47,7 @@ class CallbackAction
         );
 
         $sessionCookie = sprintf(
-            'session_token=%s; Path=/; HttpOnly; SameSite=Strict; Max-Age=%d',
+            'session_token=%s; Path=/; HttpOnly; SameSite=Strict; Secure; Max-Age=%d',
             $sessionToken,
             60 * 60 * 24 * 7
         );

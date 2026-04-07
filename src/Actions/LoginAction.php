@@ -31,7 +31,7 @@ class LoginAction
         $authUrl = $this->discord->buildAuthUrl($state);
 
         $stateCookie = sprintf(
-            'oauth_state=%s; Path=/auth/callback; HttpOnly; SameSite=Lax; Max-Age=600',
+            'oauth_state=%s; Path=/auth/callback; HttpOnly; SameSite=Lax; Secure; Max-Age=600',
             $state
         );
 
