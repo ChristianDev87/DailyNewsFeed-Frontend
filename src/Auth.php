@@ -16,7 +16,8 @@ class Auth
     ): string {
         $token  = bin2hex(random_bytes(64));
         $now    = new \DateTimeImmutable();
-        $atExp  = $now->modify("+{$accessTokenExpiresIn} seconds")->format('Y-m-d H:i:s');
+        $safeTtl = min(max($accessTokenExpiresIn, 1), 604800);
+        $atExp   = $now->modify("+{$safeTtl} seconds")->format('Y-m-d H:i:s');
         $rtExp  = $now->modify('+30 days')->format('Y-m-d H:i:s');
         $sesExp = $now->modify('+7 days')->format('Y-m-d H:i:s');
 
@@ -43,7 +44,7 @@ class Auth
     public function refreshAccessToken(string $token, Discord $discord): bool
     {
         $session = $this->db->fetchOne(
-            'SELECT * FROM sessions WHERE session_token = ?',
+            'SELECT * FROM sessions WHERE session_token = ? AND session_expires_at > NOW()',
             [$token]
         );
 
@@ -60,13 +61,17 @@ class Auth
             ->modify('+' . ($tokens['expires_in'] ?? 604800) . ' seconds')
             ->format('Y-m-d H:i:s');
 
+        $rtExp = (new \DateTimeImmutable())->modify('+30 days')->format('Y-m-d H:i:s');
+
         $this->db->execute(
-            'UPDATE sessions SET access_token = ?, access_token_expires_at = ?, refresh_token = ?
+            'UPDATE sessions SET access_token = ?, access_token_expires_at = ?,
+             refresh_token = ?, refresh_token_expires_at = ?
              WHERE session_token = ?',
             [
                 $tokens['access_token'],
                 $atExp,
                 $tokens['refresh_token'] ?? $session['refresh_token'],
+                $rtExp,
                 $token,
             ]
         );
@@ -94,13 +99,14 @@ class Auth
 
     /**
      * CSRF-Token stateless aus Session-Token ableiten (HMAC-SHA256).
+     * Stateless by design: same token for session lifetime. Per spec.
      */
     public function getCsrfToken(string $sessionToken): string
     {
         return hash_hmac(
             'sha256',
             'csrf:' . $sessionToken,
-            base64_decode(Config::require('TOKEN_ENCRYPTION_KEY'))
+            $this->encryptionKey()
         );
     }
 
@@ -111,15 +117,21 @@ class Auth
     public function encryptBotToken(string $token): array
     {
         $iv        = random_bytes(16);
-        $encrypted = openssl_encrypt(
-            $token,
-            'AES-256-CBC',
-            base64_decode(Config::require('TOKEN_ENCRYPTION_KEY')),
-            0,
-            $iv
-        );
+        $encrypted = openssl_encrypt($token, 'AES-256-CBC', $this->encryptionKey(), 0, $iv);
+        if ($encrypted === false) {
+            throw new \RuntimeException('Bot-Token-Verschlüsselung fehlgeschlagen');
+        }
 
         return ['encrypted' => $encrypted, 'iv' => base64_encode($iv)];
+    }
+
+    private function encryptionKey(): string
+    {
+        $key = base64_decode(Config::require('TOKEN_ENCRYPTION_KEY'));
+        if (strlen($key) !== 32) {
+            throw new \RuntimeException('TOKEN_ENCRYPTION_KEY muss 32 Bytes (base64-kodiert) ergeben');
+        }
+        return $key;
     }
 
     /**
