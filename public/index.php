@@ -36,7 +36,7 @@ $app->get('/', LoginAction::class);
 $app->get('/auth/callback', CallbackAction::class);
 
 // Routen mit Auth-Middleware
-$app->group('', function ($group) {
+$app->group('', function (\Slim\Routing\RouteCollectorProxy $group) {
     $group->get('/dashboard', DashboardAction::class);
     $group->get('/channel/{channel_id}', ChannelAction::class);
     $group->post('/api/feed/test', FeedTestAction::class);
