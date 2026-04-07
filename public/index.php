@@ -11,6 +11,7 @@ use App\Actions\Api\FeedTestAction;
 use App\Actions\ChannelAction;
 use App\Actions\DashboardAction;
 use App\Actions\LoginAction;
+use App\Actions\LogoutAction;
 use App\Middleware\AuthMiddleware;
 use DI\ContainerBuilder;
 use Slim\Factory\AppFactory;
@@ -48,6 +49,11 @@ $app->addErrorMiddleware((bool)($_ENV['APP_DEBUG'] ?? false), true, true);
 // Routen ohne Auth
 $app->get('/', LoginAction::class);
 $app->get('/auth/callback', CallbackAction::class);
+$app->get('/logout', LogoutAction::class);
+// DevLoginAction ist gitignored — nur lokal verfügbar
+if (class_exists(\App\Actions\DevLoginAction::class)) {
+    $app->get('/dev-login', \App\Actions\DevLoginAction::class);
+}
 
 // Routen mit Auth-Middleware
 $app->group('', function (\Slim\Routing\RouteCollectorProxy $group) {

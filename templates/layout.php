@@ -16,7 +16,10 @@ $title     = $title     ?? 'Daily News';
 <?php if (!empty($session)): ?>
 <nav>
     <a href="/dashboard" class="logo">📰 Daily News</a>
-    <span class="user"><?= htmlspecialchars($session['discord_username'] ?? '', ENT_QUOTES) ?></span>
+    <div class="nav-right">
+        <span class="user"><?= htmlspecialchars($session['discord_username'] ?? '', ENT_QUOTES) ?></span>
+        <a href="/logout" class="btn btn-ghost btn-sm">Abmelden</a>
+    </div>
 </nav>
 <?php endif; ?>
 <main>
