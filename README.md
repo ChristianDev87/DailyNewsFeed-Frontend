@@ -23,10 +23,14 @@ cd /var/www/daily-news
 
 ### 2. Datenbank einrichten
 
-Schema liegt im Hauptprojekt unter `database/schema.sql`. Tabellen anlegen:
+SQL-Dateien liegen unter `database/`:
 
 ```bash
-mysql -u root -p daily_news < schema.sql
+# Datenbank + Tabellen anlegen
+mysql -u root -p < database/schema.sql
+
+# Datenbankbenutzer anlegen (Passwort vorher in der Datei anpassen!)
+mysql -u root -p < database/create_user.sql
 ```
 
 ### 3. Umgebungsvariablen konfigurieren
