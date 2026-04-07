@@ -46,9 +46,11 @@ class CallbackAction
             (int)($tokens['expires_in'] ?? 604800)
         );
 
+        $secure = $request->getUri()->getScheme() === 'https' ? '; Secure' : '';
         $sessionCookie = sprintf(
-            'session_token=%s; Path=/; HttpOnly; SameSite=Strict; Secure; Max-Age=%d',
+            'session_token=%s; Path=/; HttpOnly; SameSite=Strict%s; Max-Age=%d',
             $sessionToken,
+            $secure,
             60 * 60 * 24 * 7
         );
         $clearState = 'oauth_state=; Path=/auth/callback; HttpOnly; SameSite=Lax; Max-Age=0';

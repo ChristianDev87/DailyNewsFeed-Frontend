@@ -30,9 +30,11 @@ class LoginAction
         $state   = bin2hex(random_bytes(16));
         $authUrl = $this->discord->buildAuthUrl($state);
 
+        $secure      = $request->getUri()->getScheme() === 'https' ? '; Secure' : '';
         $stateCookie = sprintf(
-            'oauth_state=%s; Path=/auth/callback; HttpOnly; SameSite=Lax; Secure; Max-Age=600',
-            $state
+            'oauth_state=%s; Path=/auth/callback; HttpOnly; SameSite=Lax%s; Max-Age=600',
+            $state,
+            $secure
         );
 
         return render('login', ['authUrl' => $authUrl])
