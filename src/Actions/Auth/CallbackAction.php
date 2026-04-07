@@ -48,7 +48,7 @@ class CallbackAction
 
         $secure = $request->getUri()->getScheme() === 'https' ? '; Secure' : '';
         $sessionCookie = sprintf(
-            'session_token=%s; Path=/; HttpOnly; SameSite=Strict%s; Max-Age=%d',
+            'session_token=%s; Path=/; HttpOnly; SameSite=Lax%s; Max-Age=%d',
             $sessionToken,
             $secure,
             60 * 60 * 24 * 7
