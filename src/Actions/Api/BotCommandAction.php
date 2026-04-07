@@ -22,7 +22,7 @@ class BotCommandAction
 
         $session = $request->getAttribute('session');
         $body    = (array)$request->getParsedBody();
-        $command = $body['command'] ?? '';
+        $command = trim($body['command'] ?? '');
 
         if (!in_array($command, self::ALLOWED, true)) {
             return $this->json($response, ['success' => false, 'error' => 'Unbekannter Befehl'], 400);

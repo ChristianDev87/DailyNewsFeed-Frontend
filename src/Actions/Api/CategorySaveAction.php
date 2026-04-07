@@ -43,7 +43,7 @@ class CategorySaveAction
             [$channelId, $session['discord_user_id']]
         );
         if (!$channel) {
-            return $this->json($response, ['success' => false, 'error' => 'Kanal nicht gefunden'], 404);
+            return $this->json($response, ['success' => false, 'error' => 'Kein Zugriff'], 403);
         }
 
         $maxPos = $this->db->fetchOne(
@@ -89,6 +89,10 @@ class CategorySaveAction
     private function removeBotToken(Response $response, array $session, array $body): ResponseInterface
     {
         $channelId = trim($body['channel_id'] ?? '');
+
+        if (!$channelId) {
+            return $this->json($response, ['success' => false, 'error' => 'Fehlende Felder'], 400);
+        }
 
         $channel = $this->db->fetchOne(
             'SELECT channel_id FROM channels WHERE channel_id = ? AND owner_user_id = ?',
