@@ -27,6 +27,9 @@ async function apiPost(url, data) {
         headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf() },
         body: JSON.stringify(data),
     });
+    if (!res.ok && res.headers.get('Content-Type')?.includes('application/json') === false) {
+        return { success: false, error: `HTTP ${res.status}` };
+    }
     return res.json();
 }
 
@@ -35,6 +38,9 @@ async function apiDelete(url) {
         method: 'DELETE',
         headers: { 'X-CSRF-Token': csrf() },
     });
+    if (!res.ok && res.headers.get('Content-Type')?.includes('application/json') === false) {
+        return { success: false, error: `HTTP ${res.status}` };
+    }
     return res.json();
 }
 
@@ -51,5 +57,6 @@ function escHtml(str) {
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
 }
