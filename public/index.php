@@ -20,7 +20,7 @@ require __DIR__ . '/../vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
 $dotenv->safeLoad();
 
-if (!isset($_ENV['DB_HOST'], $_ENV['DISCORD_CLIENT_ID'], $_ENV['CSRF_SECRET'])) {
+if (!isset($_ENV['DB_HOST'], $_ENV['DISCORD_CLIENT_ID'], $_ENV['TOKEN_ENCRYPTION_KEY'])) {
     http_response_code(503);
     echo '<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8"><title>Setup erforderlich</title>'
         . '<style>body{font-family:sans-serif;max-width:600px;margin:80px auto;padding:0 20px}'
