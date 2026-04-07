@@ -11,12 +11,13 @@ class FeedValidator
             return ['valid' => false, 'error' => 'Ungültige URL'];
         }
 
-        $scheme = parse_url($url, PHP_URL_SCHEME);
+        $parts  = parse_url($url);
+        $scheme = $parts['scheme'] ?? '';
         if (!in_array($scheme, ['http', 'https'], true)) {
             return ['valid' => false, 'error' => 'Nur HTTP/HTTPS erlaubt'];
         }
 
-        $host = parse_url($url, PHP_URL_HOST);
+        $host = $parts['host'] ?? '';
         if (!$host) {
             return ['valid' => false, 'error' => 'Ungültiger Host'];
         }
@@ -51,13 +52,19 @@ class FeedValidator
             return true;
         }
 
-        $ranges = [
-            ['127.0.0.0',   '127.255.255.255'],
-            ['10.0.0.0',    '10.255.255.255'],
-            ['172.16.0.0',  '172.31.255.255'],
-            ['192.168.0.0', '192.168.255.255'],
-            ['169.254.0.0', '169.254.255.255'],
-        ];
+        static $ranges = null;
+        if ($ranges === null) {
+            $ranges = array_map(
+                fn(array $r) => [ip2long($r[0]), ip2long($r[1])],
+                [
+                    ['127.0.0.0',   '127.255.255.255'],
+                    ['10.0.0.0',    '10.255.255.255'],
+                    ['172.16.0.0',  '172.31.255.255'],
+                    ['192.168.0.0', '192.168.255.255'],
+                    ['169.254.0.0', '169.254.255.255'],
+                ]
+            );
+        }
 
         $ipLong = ip2long($ip);
         if ($ipLong === false) {
@@ -65,7 +72,7 @@ class FeedValidator
         }
 
         foreach ($ranges as [$start, $end]) {
-            if ($ipLong >= ip2long($start) && $ipLong <= ip2long($end)) {
+            if ($ipLong >= $start && $ipLong <= $end) {
                 return true;
             }
         }
