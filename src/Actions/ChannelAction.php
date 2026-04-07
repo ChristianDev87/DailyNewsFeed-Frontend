@@ -20,6 +20,10 @@ class ChannelAction
         $csrfToken = $request->getAttribute('csrf_token');
         $channelId = $args['channel_id'];
 
+        if (!ctype_digit($channelId)) {
+            return $response->withStatus(400);
+        }
+
         $channel = $this->db->fetchOne(
             'SELECT * FROM channels WHERE channel_id = ? AND owner_user_id = ? AND active = 1',
             [$channelId, $session['discord_user_id']]
