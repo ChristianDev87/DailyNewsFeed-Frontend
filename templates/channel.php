@@ -23,10 +23,10 @@ $chId = htmlspecialchars($channel['channel_id'], ENT_QUOTES);
         </span>
         <span style="display:flex;align-items:center;gap:6px">
             <button class="btn btn-ghost" style="padding:3px 9px;font-size:12px"
-                onclick="editCategory(<?= $catId ?>,
-                    '<?= htmlspecialchars(addslashes($cat['label']), ENT_QUOTES) ?>',
-                    '<?= htmlspecialchars(addslashes($cat['emoji']), ENT_QUOTES) ?>',
-                    event)">✎</button>
+                data-cat-id="<?= $catId ?>"
+                data-label="<?= htmlspecialchars($cat['label'], ENT_QUOTES) ?>"
+                data-emoji="<?= htmlspecialchars($cat['emoji'], ENT_QUOTES) ?>"
+                onclick="editCategory(this, event)">✎</button>
             <button class="btn btn-danger" style="padding:3px 9px;font-size:12px"
                 onclick="deleteCategory(<?= $catId ?>, event)">✕</button>
             <span style="color:var(--muted)">▼</span>
@@ -189,14 +189,17 @@ async function saveFeed(id) {
     }
 }
 
-async function editCategory(id, currentLabel, currentEmoji, e) {
+async function editCategory(btn, e) {
     e.stopPropagation();
-    const label = prompt('Kategorie-Name:', currentLabel);
-    if (label === null) return;
-    const emoji = prompt('Emoji:', currentEmoji);
+    const id    = parseInt(btn.dataset.catId);
+    const label = prompt('Kategorie-Name:', btn.dataset.label);
+    if (label === null || label.trim() === '') return;
+    const emoji = prompt('Emoji:', btn.dataset.emoji);
 
     const data = await apiPut(`/api/category/${id}`, { label: label.trim(), emoji: (emoji || '📰').trim() });
     if (data.success) {
+        btn.dataset.label = data.label;
+        btn.dataset.emoji = data.emoji;
         document.getElementById(`cat-label-${id}`).innerHTML =
             `${escHtml(data.emoji)} <strong>${escHtml(data.label)}</strong>`;
     } else {

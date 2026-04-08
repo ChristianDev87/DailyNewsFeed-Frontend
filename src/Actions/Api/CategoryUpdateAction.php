@@ -16,7 +16,7 @@ class CategoryUpdateAction
     {
         $session    = $request->getAttribute('session');
         $categoryId = (int)($args['id'] ?? 0);
-        $body       = (array)$request->getParsedBody();
+        $body       = (array)($request->getParsedBody() ?? json_decode((string)$request->getBody(), true) ?? []);
 
         $label = trim($body['label'] ?? '');
         $emoji = trim($body['emoji'] ?? '📰');

@@ -16,7 +16,7 @@ class FeedUpdateAction
     {
         $session = $request->getAttribute('session');
         $feedId  = (int)($args['id'] ?? 0);
-        $body    = (array)$request->getParsedBody();
+        $body    = (array)($request->getParsedBody() ?? json_decode((string)$request->getBody(), true) ?? []);
 
         $name     = trim($body['name']     ?? '');
         $url      = trim($body['url']      ?? '');
