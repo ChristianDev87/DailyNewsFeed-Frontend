@@ -69,6 +69,12 @@ class Discord
         return isset($result['user']) ? $result : null;
     }
 
+    public function getBotGuilds(): array
+    {
+        $result = $this->get('/users/@me/guilds', 'Bot ' . Config::require('DISCORD_BOT_TOKEN'));
+        return is_array($result) ? $result : [];
+    }
+
     public function getGuildChannels(string $guildId): array
     {
         $result = $this->get("/guilds/$guildId/channels", 'Bot ' . Config::require('DISCORD_BOT_TOKEN'));

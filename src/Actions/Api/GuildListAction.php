@@ -18,10 +18,15 @@ class GuildListAction
         $guilds  = $this->discord->getUserGuilds($session['access_token']);
 
         // Nur Server wo User Admin oder Owner ist (ADMINISTRATOR=0x8, MANAGE_GUILD=0x20)
-        $filtered = array_values(array_filter($guilds, function ($g) {
+        $filtered = array_filter($guilds, function ($g) {
             $perms = (int)($g['permissions'] ?? 0);
             return ($g['owner'] ?? false) || ($perms & 0x8) || ($perms & 0x20);
-        }));
+        });
+
+        // Nur Server wo der Bot auch ist
+        $botGuilds  = $this->discord->getBotGuilds();
+        $botGuildIds = array_column($botGuilds, 'id');
+        $filtered = array_values(array_filter($filtered, fn($g) => in_array($g['id'], $botGuildIds, true)));
 
         $result = array_map(fn($g) => [
             'id'   => $g['id'],

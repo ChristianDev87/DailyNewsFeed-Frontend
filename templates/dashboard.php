@@ -41,7 +41,7 @@ async function botCmd(command) {
 
 <div id="add-channel-form" class="add-channel-panel" style="display:none">
     <h3>Kanal registrieren</h3>
-    <p style="color:var(--muted);font-size:14px">Der Bot muss bereits auf dem Server eingeladen sein.</p>
+    <p style="color:var(--muted);font-size:14px">Es werden nur Server angezeigt auf denen du Admin-Rechte hast <strong>und</strong> der Bot bereits eingeladen wurde.</p>
     <div class="form-row">
         <label>Server</label>
         <select id="guild-select" onchange="loadChannels()" disabled>
