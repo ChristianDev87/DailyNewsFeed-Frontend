@@ -63,8 +63,10 @@ class AuthMiddleware implements MiddlewareInterface
             }
         }
 
-        $heartbeat = $this->db->fetchOne('SELECT last_seen FROM bot_status LIMIT 1');
-        $botOnline = $heartbeat && strtotime($heartbeat['last_seen']) > time() - 180;
+        $heartbeat = $this->db->fetchOne('SELECT status, last_seen FROM bot_status LIMIT 1');
+        $botOnline = $heartbeat
+            && $heartbeat['status'] === 'online'
+            && strtotime($heartbeat['last_seen']) > time() - 180;
 
         return $handler->handle(
             $request
