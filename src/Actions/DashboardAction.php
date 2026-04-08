@@ -38,13 +38,6 @@ class DashboardAction
             [$session['discord_user_id']]
         );
 
-        $botStatus = null;
-        if ($isSuperAdmin) {
-            $botStatus = $this->db->fetchOne(
-                "SELECT * FROM bot_commands WHERE status = 'done' ORDER BY executed_at DESC LIMIT 1"
-            );
-        }
-
         $inviteUrl = 'https://discord.com/oauth2/authorize?' . http_build_query([
             'client_id'   => Config::require('DISCORD_CLIENT_ID'),
             'permissions' => self::BOT_PERMISSIONS,
@@ -57,7 +50,6 @@ class DashboardAction
             'csrfToken'    => $csrfToken,
             'channels'     => $channels,
             'isSuperAdmin' => $isSuperAdmin,
-            'botStatus'    => $botStatus,
             'inviteUrl'    => $inviteUrl,
         ]);
     }

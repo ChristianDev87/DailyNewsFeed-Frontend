@@ -1,7 +1,8 @@
 <?php
-$session   = $session   ?? [];
-$csrfToken = $csrfToken ?? '';
-$title     = $title     ?? 'Daily News';
+$session      = $session      ?? [];
+$csrfToken    = $csrfToken    ?? '';
+$title        = $title        ?? 'Daily News';
+$isSuperAdmin = $isSuperAdmin ?? false;
 ?>
 <!DOCTYPE html>
 <html lang="de">
@@ -17,6 +18,9 @@ $title     = $title     ?? 'Daily News';
 <nav>
     <a href="/dashboard" class="logo">📰 Daily News</a>
     <div class="nav-right">
+        <?php if ($isSuperAdmin): ?>
+        <a href="/admin" class="btn btn-ghost btn-sm">⚙ Admin</a>
+        <?php endif; ?>
         <span class="user"><?= htmlspecialchars($session['discord_username'] ?? '', ENT_QUOTES) ?></span>
         <a href="/logout" class="btn btn-ghost btn-sm">Abmelden</a>
     </div>

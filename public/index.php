@@ -15,6 +15,7 @@ use App\Actions\Api\FeedTestAction;
 use App\Actions\Api\FeedUpdateAction;
 use App\Actions\Api\GuildChannelsAction;
 use App\Actions\Api\GuildListAction;
+use App\Actions\AdminAction;
 use App\Actions\ChannelAction;
 use App\Actions\DashboardAction;
 use App\Actions\LoginAction;
@@ -65,6 +66,7 @@ if (class_exists(\App\Actions\DevLoginAction::class)) {
 // Routen mit Auth-Middleware
 $app->group('', function (\Slim\Routing\RouteCollectorProxy $group) {
     $group->get('/dashboard', DashboardAction::class);
+    $group->get('/admin', AdminAction::class);
     $group->get('/channel/{channel_id}', ChannelAction::class);
     $group->post('/api/feed/test', FeedTestAction::class);
     $group->post('/api/feed/save', FeedSaveAction::class);

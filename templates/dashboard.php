@@ -1,38 +1,17 @@
 <?php
 /**
- * @var array      $channels
- * @var bool       $isSuperAdmin
- * @var array|null $botStatus
- * @var string     $csrfToken
- * @var string     $inviteUrl
+ * @var array  $channels
+ * @var bool   $isSuperAdmin
+ * @var string $csrfToken
+ * @var string $inviteUrl
  */
 ?>
 <h1>Dashboard</h1>
 
 <?php if ($isSuperAdmin): ?>
-<div class="bot-panel">
-    <h2>Bot-Verwaltung</h2>
-    <?php if ($botStatus): ?>
-        <p><span class="dot online"></span>Letzter Lauf: <?= htmlspecialchars(date('d.m.Y H:i', strtotime($botStatus['executed_at'])), ENT_QUOTES) ?></p>
-    <?php else: ?>
-        <p><span class="dot offline"></span>Kein Lauf bisher aufgezeichnet.</p>
-    <?php endif; ?>
-    <div class="actions">
-        <button class="btn btn-ghost"    onclick="botCmd('restart_bot')">🔄 Bot neu starten</button>
-        <button class="btn btn-primary"  onclick="botCmd('run_digest')">▶ Digest jetzt ausführen</button>
-    </div>
+<div class="bot-panel" style="margin-bottom:24px">
+    <a href="/admin" class="btn btn-ghost btn-sm">⚙ Admin-Bereich öffnen</a>
 </div>
-<script>
-async function botCmd(command) {
-    const res  = await fetch('/api/bot/command', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': '<?= htmlspecialchars($csrfToken, ENT_QUOTES) ?>' },
-        body: JSON.stringify({ command }),
-    });
-    const data = await res.json();
-    alert(data.message ?? (data.success ? 'Befehl gesendet.' : `Fehler: ${data.error}`));
-}
-</script>
 <?php endif; ?>
 
 <div class="section-header">
