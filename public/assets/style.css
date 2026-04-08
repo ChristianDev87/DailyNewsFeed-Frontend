@@ -227,3 +227,12 @@ input:focus { outline: 2px solid var(--accent); border-color: transparent; }
 }
 .bot-online  { color: var(--success); }
 .bot-offline { color: var(--danger); }
+
+/* Pagination */
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+}
+.page-info { font-size: 13px; color: var(--muted); }

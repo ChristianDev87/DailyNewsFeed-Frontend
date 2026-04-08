@@ -24,8 +24,16 @@ class AdminAction
         $session   = $request->getAttribute('session');
         $csrfToken = $request->getAttribute('csrf_token');
 
-        $recentCommands = $this->db->fetchAll(
-            'SELECT * FROM bot_commands ORDER BY created_at DESC LIMIT 30'
+        $perPage     = 20;
+        $page        = max(1, (int)($request->getQueryParams()['page'] ?? 1));
+        $offset      = ($page - 1) * $perPage;
+        $totalCmds   = (int)$this->db->fetchOne('SELECT COUNT(*) AS n FROM bot_commands')['n'];
+        $totalPages  = (int)ceil($totalCmds / $perPage);
+        $page        = min($page, max(1, $totalPages));
+
+        $commands = $this->db->fetchAll(
+            'SELECT * FROM bot_commands ORDER BY created_at DESC LIMIT ? OFFSET ?',
+            [$perPage, $offset]
         );
 
         $stats = $this->db->fetchOne(
@@ -37,13 +45,16 @@ class AdminAction
         );
 
         return render('admin', [
-            'title'          => 'Admin',
-            'session'        => $session,
-            'csrfToken'      => $csrfToken,
-            'isSuperAdmin'   => true,
-            'botOnline'      => $request->getAttribute('bot_online'),
-            'recentCommands' => $recentCommands,
-            'stats'          => $stats,
+            'title'        => 'Admin',
+            'session'      => $session,
+            'csrfToken'    => $csrfToken,
+            'isSuperAdmin' => true,
+            'botOnline'    => $request->getAttribute('bot_online'),
+            'commands'     => $commands,
+            'stats'        => $stats,
+            'page'         => $page,
+            'totalPages'   => $totalPages,
+            'totalCmds'    => $totalCmds,
         ]);
     }
 }

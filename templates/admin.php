@@ -1,8 +1,11 @@
 <?php
 /**
  * @var array  $stats
- * @var array  $recentCommands
+ * @var array  $commands
  * @var string $csrfToken
+ * @var int    $page
+ * @var int    $totalPages
+ * @var int    $totalCmds
  */
 ?>
 <h1>Admin</h1>
@@ -36,9 +39,12 @@
     <p id="bot-msg" style="margin-top:10px;font-size:14px"></p>
 </div>
 
-<h2 style="margin-top:32px">Letzte Befehle</h2>
+<div style="display:flex;align-items:baseline;gap:12px;margin-top:32px">
+    <h2 style="margin:0">Befehls-Historie</h2>
+    <span style="color:var(--muted);font-size:13px"><?= $totalCmds ?> Einträge</span>
+</div>
 
-<?php if (empty($recentCommands)): ?>
+<?php if (empty($commands)): ?>
     <p style="color:var(--muted)">Noch keine Befehle.</p>
 <?php else: ?>
 <div class="table-wrap">
@@ -54,7 +60,7 @@
         </tr>
     </thead>
     <tbody>
-    <?php foreach ($recentCommands as $cmd): ?>
+    <?php foreach ($commands as $cmd): ?>
         <tr>
             <td><?= (int)$cmd['id'] ?></td>
             <td><code><?= htmlspecialchars($cmd['command'], ENT_QUOTES) ?></code></td>
@@ -76,6 +82,19 @@
     </tbody>
 </table>
 </div>
+
+<?php if ($totalPages > 1): ?>
+<div class="pagination">
+    <?php if ($page > 1): ?>
+        <a href="/admin?page=<?= $page - 1 ?>" class="btn btn-ghost btn-sm">← Zurück</a>
+    <?php endif; ?>
+    <span class="page-info">Seite <?= $page ?> / <?= $totalPages ?></span>
+    <?php if ($page < $totalPages): ?>
+        <a href="/admin?page=<?= $page + 1 ?>" class="btn btn-ghost btn-sm">Weiter →</a>
+    <?php endif; ?>
+</div>
+<?php endif; ?>
+
 <?php endif; ?>
 
 <script>
