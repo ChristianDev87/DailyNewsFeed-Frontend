@@ -6,7 +6,7 @@ const csrf = () => document.querySelector('meta[name="csrf-token"]')?.content ??
 // Akkordeon
 document.addEventListener('click', e => {
     const header = e.target.closest('.accordion-header');
-    if (!header || e.target.closest('.handle')) return;
+    if (!header || e.target.closest('.handle') || e.target.closest('button')) return;
 
     const body   = header.nextElementSibling;
     const isOpen = body.classList.contains('open');
@@ -33,6 +33,18 @@ async function apiPost(url, data) {
     return res.json();
 }
 
+async function apiPut(url, data) {
+    const res = await fetch(url, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf() },
+        body: JSON.stringify(data),
+    });
+    if (!res.ok && res.headers.get('Content-Type')?.includes('application/json') === false) {
+        return { success: false, error: `HTTP ${res.status}` };
+    }
+    return res.json();
+}
+
 async function apiDelete(url) {
     const res = await fetch(url, {
         method: 'DELETE',
@@ -44,14 +56,14 @@ async function apiDelete(url) {
     return res.json();
 }
 
-// Feed löschen (wird von channel.php aufgerufen)
-async function deleteFeed(id, rowEl) {
+// Feed löschen — entfernt den Wrapper-Div (inkl. Edit-Zeile)
+async function deleteFeed(id) {
     if (!confirm('Feed löschen?')) return;
     const data = await apiDelete(`/api/feed/${id}`);
-    if (data.success) rowEl.remove();
+    if (data.success) document.getElementById(`fwrap-${id}`)?.remove();
 }
 
-// Kategorie löschen (wird von channel.php aufgerufen)
+// Kategorie löschen
 async function deleteCategory(id, e) {
     e.stopPropagation();
     if (!confirm('Kategorie und alle zugehörigen Feeds löschen?')) return;

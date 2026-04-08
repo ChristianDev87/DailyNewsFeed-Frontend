@@ -11,41 +11,66 @@ $chId = htmlspecialchars($channel['channel_id'], ENT_QUOTES);
 <h1>⚙️ <?= htmlspecialchars($channel['guild_name'] ?? 'Server', ENT_QUOTES) ?> — #<?= htmlspecialchars($channel['channel_name'] ?? $channel['channel_id'], ENT_QUOTES) ?></h1>
 
 <div id="cat-list" style="margin:24px 0">
-<?php foreach ($categories as $cat): ?>
-<div class="accordion" data-cat-id="<?= (int)$cat['id'] ?>">
+<?php foreach ($categories as $cat):
+    $catId = (int)$cat['id'];
+?>
+<div class="accordion" data-cat-id="<?= $catId ?>">
     <div class="accordion-header">
         <span>
             <span class="handle" title="Ziehen zum Sortieren">⠿</span>
-            <?= htmlspecialchars($cat['emoji'], ENT_QUOTES) ?>
-            <strong><?= htmlspecialchars($cat['label'], ENT_QUOTES) ?></strong>
-            <span style="color:var(--muted);font-size:13px;margin-left:8px">(<?= htmlspecialchars((string)count($cat['feeds']), ENT_QUOTES) ?> Feeds)</span>
+            <span id="cat-label-<?= $catId ?>"><?= htmlspecialchars($cat['emoji'], ENT_QUOTES) ?> <strong><?= htmlspecialchars($cat['label'], ENT_QUOTES) ?></strong></span>
+            <span style="color:var(--muted);font-size:13px;margin-left:8px" id="cat-count-<?= $catId ?>">(<?= count($cat['feeds']) ?> Feeds)</span>
         </span>
-        <span style="display:flex;align-items:center;gap:8px">
+        <span style="display:flex;align-items:center;gap:6px">
+            <button class="btn btn-ghost" style="padding:3px 9px;font-size:12px"
+                onclick="editCategory(<?= $catId ?>,
+                    '<?= htmlspecialchars(addslashes($cat['label']), ENT_QUOTES) ?>',
+                    '<?= htmlspecialchars(addslashes($cat['emoji']), ENT_QUOTES) ?>',
+                    event)">✎</button>
             <button class="btn btn-danger" style="padding:3px 9px;font-size:12px"
-                onclick="deleteCategory(<?= (int)$cat['id'] ?>, event)">✕</button>
+                onclick="deleteCategory(<?= $catId ?>, event)">✕</button>
             <span style="color:var(--muted)">▼</span>
         </span>
     </div>
     <div class="accordion-body">
-        <div id="feeds-<?= (int)$cat['id'] ?>">
-        <?php foreach ($cat['feeds'] as $feed): ?>
-            <div class="feed-item" data-feed-id="<?= (int)$feed['id'] ?>">
-                <span>
-                    <?= htmlspecialchars($feed['name'], ENT_QUOTES) ?>
-                    <span style="color:var(--muted);font-size:12px"><?= htmlspecialchars($feed['url'], ENT_QUOTES) ?></span>
-                </span>
-                <button class="btn btn-danger" style="padding:4px 10px;font-size:12px"
-                    onclick="deleteFeed(<?= (int)$feed['id'] ?>, this.closest('.feed-item'))">✕</button>
+        <div id="feeds-<?= $catId ?>">
+        <?php foreach ($cat['feeds'] as $feed):
+            $fId = (int)$feed['id'];
+        ?>
+            <div id="fwrap-<?= $fId ?>">
+                <div class="feed-item">
+                    <span>
+                        <span id="fname-disp-<?= $fId ?>"><?= htmlspecialchars($feed['name'], ENT_QUOTES) ?></span>
+                        <span style="color:var(--muted);font-size:12px;margin-left:4px" id="furl-disp-<?= $fId ?>"><?= htmlspecialchars($feed['url'], ENT_QUOTES) ?></span>
+                        <span style="color:var(--muted);font-size:12px;margin-left:4px">max: <span id="fmax-disp-<?= $fId ?>"><?= (int)$feed['max_items'] ?></span></span>
+                    </span>
+                    <span style="display:flex;gap:4px">
+                        <button class="btn btn-ghost" style="padding:3px 8px;font-size:12px"
+                            onclick="toggleEditFeed(<?= $fId ?>)">✎</button>
+                        <button class="btn btn-danger" style="padding:3px 8px;font-size:12px"
+                            onclick="deleteFeed(<?= $fId ?>)">✕</button>
+                    </span>
+                </div>
+                <div id="fedit-<?= $fId ?>" style="display:none;padding:8px 12px;background:var(--bg);border-radius:var(--radius);margin-bottom:6px">
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+                        <input type="text"   id="fedit-name-<?= $fId ?>" value="<?= htmlspecialchars($feed['name'], ENT_QUOTES) ?>" placeholder="Name" style="flex:1;min-width:100px">
+                        <input type="url"    id="fedit-url-<?= $fId ?>"  value="<?= htmlspecialchars($feed['url'], ENT_QUOTES) ?>"  placeholder="Feed-URL" style="flex:2;min-width:160px">
+                        <input type="number" id="fedit-max-<?= $fId ?>"  value="<?= (int)$feed['max_items'] ?>" min="1" max="20" style="width:70px" title="Max. Artikel pro Lauf">
+                        <button class="btn btn-primary" style="padding:4px 12px;font-size:13px" onclick="saveFeed(<?= $fId ?>)">Speichern</button>
+                        <button class="btn btn-ghost"   style="padding:4px 12px;font-size:13px" onclick="toggleEditFeed(<?= $fId ?>)">Abbrechen</button>
+                    </div>
+                    <div id="fedit-status-<?= $fId ?>" style="font-size:12px;margin-top:4px;min-height:16px"></div>
+                </div>
             </div>
         <?php endforeach; ?>
         </div>
         <div class="feed-add-row">
-            <input type="url"  id="furl-<?= (int)$cat['id'] ?>" placeholder="Feed-URL...">
-            <input type="text" id="fname-<?= (int)$cat['id'] ?>" placeholder="Name" style="max-width:140px">
-            <button class="btn btn-ghost"   onclick="testFeed(<?= (int)$cat['id'] ?>)">Testen</button>
-            <button class="btn btn-primary" onclick="addFeed(<?= (int)$cat['id'] ?>)">+ Hinzufügen</button>
+            <input type="url"  id="furl-<?= $catId ?>" placeholder="Feed-URL...">
+            <input type="text" id="fnameinput-<?= $catId ?>" placeholder="Name" style="max-width:140px">
+            <button class="btn btn-ghost"   onclick="testFeed(<?= $catId ?>)">Testen</button>
+            <button class="btn btn-primary" onclick="addFeed(<?= $catId ?>)">+ Hinzufügen</button>
         </div>
-        <div id="fstatus-<?= (int)$cat['id'] ?>" style="font-size:13px;margin-top:6px;min-height:18px"></div>
+        <div id="fstatus-<?= $catId ?>" style="font-size:13px;margin-top:6px;min-height:18px"></div>
     </div>
 </div>
 <?php endforeach; ?>
@@ -91,32 +116,91 @@ async function testFeed(catId) {
     if (!url) return;
     status.textContent = 'Prüfe...';
     const data = await apiPost('/api/feed/test', { url });
-    status.textContent  = data.valid ? '✓ Gültiger Feed' : `✗ ${data.error}`;
-    status.style.color  = data.valid ? 'var(--success)' : 'var(--danger)';
+    status.textContent = data.valid ? '✓ Gültiger Feed' : `✗ ${data.error}`;
+    status.style.color = data.valid ? 'var(--success)' : 'var(--danger)';
 }
 
 async function addFeed(catId) {
     const url    = document.getElementById(`furl-${catId}`).value.trim();
-    const name   = document.getElementById(`fname-${catId}`).value.trim();
+    const name   = document.getElementById(`fnameinput-${catId}`).value.trim();
     const status = document.getElementById(`fstatus-${catId}`);
     if (!url || !name) { status.textContent = 'URL und Name erforderlich.'; return; }
 
     const data = await apiPost('/api/feed/save', { category_id: catId, url, name });
     if (data.success) {
+        const id = data.id;
         document.getElementById(`feeds-${catId}`).insertAdjacentHTML('beforeend',
-            `<div class="feed-item" data-feed-id="${data.id}">
-                <span>${escHtml(name)} <span style="color:var(--muted);font-size:12px">${escHtml(url)}</span></span>
-                <button class="btn btn-danger" style="padding:4px 10px;font-size:12px"
-                    onclick="deleteFeed(${data.id}, this.closest('.feed-item'))">✕</button>
-             </div>`
+            `<div id="fwrap-${id}">
+                <div class="feed-item">
+                    <span>
+                        <span id="fname-disp-${id}">${escHtml(name)}</span>
+                        <span style="color:var(--muted);font-size:12px;margin-left:4px" id="furl-disp-${id}">${escHtml(url)}</span>
+                        <span style="color:var(--muted);font-size:12px;margin-left:4px">max: <span id="fmax-disp-${id}">5</span></span>
+                    </span>
+                    <span style="display:flex;gap:4px">
+                        <button class="btn btn-ghost" style="padding:3px 8px;font-size:12px" onclick="toggleEditFeed(${id})">✎</button>
+                        <button class="btn btn-danger" style="padding:3px 8px;font-size:12px" onclick="deleteFeed(${id})">✕</button>
+                    </span>
+                </div>
+                <div id="fedit-${id}" style="display:none;padding:8px 12px;background:var(--bg);border-radius:var(--radius);margin-bottom:6px">
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+                        <input type="text"   id="fedit-name-${id}" value="${escHtml(name)}" placeholder="Name" style="flex:1;min-width:100px">
+                        <input type="url"    id="fedit-url-${id}"  value="${escHtml(url)}"  placeholder="Feed-URL" style="flex:2;min-width:160px">
+                        <input type="number" id="fedit-max-${id}"  value="5" min="1" max="20" style="width:70px">
+                        <button class="btn btn-primary" style="padding:4px 12px;font-size:13px" onclick="saveFeed(${id})">Speichern</button>
+                        <button class="btn btn-ghost"   style="padding:4px 12px;font-size:13px" onclick="toggleEditFeed(${id})">Abbrechen</button>
+                    </div>
+                    <div id="fedit-status-${id}" style="font-size:12px;margin-top:4px;min-height:16px"></div>
+                </div>
+            </div>`
         );
-        document.getElementById(`furl-${catId}`).value  = '';
-        document.getElementById(`fname-${catId}`).value = '';
+        document.getElementById(`furl-${catId}`).value = '';
+        document.getElementById(`fnameinput-${catId}`).value = '';
         status.textContent = '✓ Feed hinzugefügt';
         status.style.color = 'var(--success)';
     } else {
         status.textContent = `✗ ${data.error ?? 'Fehler'}`;
         status.style.color = 'var(--danger)';
+    }
+}
+
+function toggleEditFeed(id) {
+    const edit = document.getElementById(`fedit-${id}`);
+    edit.style.display = edit.style.display === 'none' ? 'block' : 'none';
+}
+
+async function saveFeed(id) {
+    const name     = document.getElementById(`fedit-name-${id}`).value.trim();
+    const url      = document.getElementById(`fedit-url-${id}`).value.trim();
+    const maxItems = parseInt(document.getElementById(`fedit-max-${id}`).value) || 5;
+    const status   = document.getElementById(`fedit-status-${id}`);
+
+    if (!name || !url) { status.textContent = 'Name und URL erforderlich.'; status.style.color = 'var(--danger)'; return; }
+
+    const data = await apiPut(`/api/feed/${id}`, { name, url, max_items: maxItems });
+    if (data.success) {
+        document.getElementById(`fname-disp-${id}`).textContent = name;
+        document.getElementById(`furl-disp-${id}`).textContent  = url;
+        document.getElementById(`fmax-disp-${id}`).textContent  = maxItems;
+        toggleEditFeed(id);
+    } else {
+        status.textContent = `✗ ${data.error ?? 'Fehler'}`;
+        status.style.color = 'var(--danger)';
+    }
+}
+
+async function editCategory(id, currentLabel, currentEmoji, e) {
+    e.stopPropagation();
+    const label = prompt('Kategorie-Name:', currentLabel);
+    if (label === null) return;
+    const emoji = prompt('Emoji:', currentEmoji);
+
+    const data = await apiPut(`/api/category/${id}`, { label: label.trim(), emoji: (emoji || '📰').trim() });
+    if (data.success) {
+        document.getElementById(`cat-label-${id}`).innerHTML =
+            `${escHtml(data.emoji)} <strong>${escHtml(data.label)}</strong>`;
+    } else {
+        alert(`Fehler: ${data.error}`);
     }
 }
 
