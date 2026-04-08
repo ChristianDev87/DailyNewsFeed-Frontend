@@ -3,6 +3,7 @@ $session      = $session      ?? [];
 $csrfToken    = $csrfToken    ?? '';
 $title        = $title        ?? 'Daily News';
 $isSuperAdmin = $isSuperAdmin ?? false;
+$botOnline    = $botOnline    ?? null;
 ?>
 <!DOCTYPE html>
 <html lang="de">
@@ -20,6 +21,11 @@ $isSuperAdmin = $isSuperAdmin ?? false;
     <div class="nav-right">
         <?php if ($isSuperAdmin): ?>
         <a href="/admin" class="btn btn-ghost btn-sm">⚙ Admin</a>
+        <?php endif; ?>
+        <?php if ($botOnline !== null): ?>
+        <span class="bot-status <?= $botOnline ? 'bot-online' : 'bot-offline' ?>" title="Bot <?= $botOnline ? 'online' : 'offline' ?>">
+            <span class="dot <?= $botOnline ? 'online' : 'offline' ?>"></span><?= $botOnline ? 'online' : 'offline' ?>
+        </span>
         <?php endif; ?>
         <span class="user"><?= htmlspecialchars($session['discord_username'] ?? '', ENT_QUOTES) ?></span>
         <a href="/logout" class="btn btn-ghost btn-sm">Abmelden</a>

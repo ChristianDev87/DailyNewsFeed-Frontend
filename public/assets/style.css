@@ -216,3 +216,14 @@ input:focus { outline: 2px solid var(--accent); border-color: transparent; }
 .status-badge.status-done    { color: var(--success); }
 .status-badge.status-pending { color: var(--warning, #f6ad55); }
 .status-badge.status-failed  { color: var(--danger); }
+
+/* Bot status in nav */
+.bot-status {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: var(--muted);
+}
+.bot-online  { color: var(--success); }
+.bot-offline { color: var(--danger); }
