@@ -50,20 +50,20 @@ cp .env.example .env
 nano .env
 ```
 
-| Variable | Beschreibung |
-|---|---|
-| `DISCORD_CLIENT_ID` | Client-ID der Discord-Applikation |
-| `DISCORD_CLIENT_SECRET` | Client-Secret der Discord-Applikation |
-| `DISCORD_REDIRECT_URI` | OAuth2-Callback-URL (z. B. `https://deine-domain.de/auth/callback`) |
-| `DISCORD_BOT_TOKEN` | Bot-Token für Guild-Member-Abfragen |
-| `DB_HOST` | Datenbank-Host (Standard: `localhost`) |
-| `DB_PORT` | Datenbank-Port (Standard: `3306`) |
-| `DB_NAME` | Datenbankname |
-| `DB_USER` | Datenbankbenutzer |
-| `DB_PASS` | Datenbankpasswort |
-| `TOKEN_ENCRYPTION_KEY` | 32-Byte-Schlüssel als Base64 — **muss identisch mit dem Bot sein** |
-| `SUPERADMIN_IDS` | Kommagetrennte Discord-User-IDs mit Admin-Zugriff |
-| `APP_DEBUG` | `true` für Entwicklung, `false` für Produktion |
+| Variable | Pflicht | Beschreibung |
+|---|:---:|---|
+| `DISCORD_CLIENT_ID` | ✅ | Client-ID der Discord-Applikation |
+| `DISCORD_CLIENT_SECRET` | ✅ | Client-Secret der Discord-Applikation |
+| `DISCORD_REDIRECT_URI` | ✅ | OAuth2-Callback-URL (z. B. `https://deine-domain.de/auth/callback`) |
+| `DISCORD_BOT_TOKEN` | ✅ | Bot-Token für Guild-Member-Abfragen |
+| `DB_HOST` | ✅ | Datenbank-Host |
+| `DB_NAME` | ✅ | Datenbankname |
+| `DB_USER` | ✅ | Datenbankbenutzer |
+| `DB_PASS` | ✅ | Datenbankpasswort |
+| `TOKEN_ENCRYPTION_KEY` | ✅ | 32-Byte-Schlüssel als Base64 — **muss identisch mit dem Bot sein** |
+| `DB_PORT` | — | Datenbank-Port (Standard: `3306`) |
+| `SUPERADMIN_IDS` | — | Kommagetrennte Discord-User-IDs mit Admin-Zugriff |
+| `APP_DEBUG` | — | `true` für Entwicklung, `false` für Produktion (Standard: `false`) |
 
 Schlüssel generieren:
 ```bash
