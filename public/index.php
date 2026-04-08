@@ -5,6 +5,7 @@ use App\Actions\Auth\CallbackAction;
 use App\Actions\Api\BotCommandAction;
 use App\Actions\Api\CategoryOrderAction;
 use App\Actions\Api\CategorySaveAction;
+use App\Actions\Api\ChannelDeleteAction;
 use App\Actions\Api\ChannelRegisterAction;
 use App\Actions\Api\FeedDeleteAction;
 use App\Actions\Api\FeedSaveAction;
@@ -71,6 +72,7 @@ $app->group('', function (\Slim\Routing\RouteCollectorProxy $group) {
     $group->get('/api/guilds', GuildListAction::class);
     $group->get('/api/guilds/{guild_id}/channels', GuildChannelsAction::class);
     $group->post('/api/channel/register', ChannelRegisterAction::class);
+    $group->delete('/api/channel/{channel_id}', ChannelDeleteAction::class);
 })->add(AuthMiddleware::class);
 
 $app->run();

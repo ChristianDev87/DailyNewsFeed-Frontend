@@ -75,7 +75,10 @@ async function botCmd(command) {
                 ? 'Letzter Digest: ' . htmlspecialchars(date('d.m.Y H:i', strtotime($ch['last_digest_at'])), ENT_QUOTES)
                 : 'Noch kein Digest' ?>
         </div>
-        <a href="/channel/<?= htmlspecialchars($ch['channel_id'], ENT_QUOTES) ?>" class="btn btn-primary">Konfigurieren</a>
+        <div class="card-actions">
+            <a href="/channel/<?= htmlspecialchars($ch['channel_id'], ENT_QUOTES) ?>" class="btn btn-primary">Konfigurieren</a>
+            <button class="btn btn-danger btn-sm" onclick="removeChannel('<?= htmlspecialchars($ch['channel_id'], ENT_QUOTES) ?>', '<?= htmlspecialchars($ch['channel_name'] ?? $ch['channel_id'], ENT_QUOTES) ?>')">Entfernen</button>
+        </div>
     </div>
     <?php endforeach; ?>
 </div>
@@ -155,6 +158,16 @@ async function registerChannel() {
     } else {
         errEl.textContent = res?.error ?? 'Fehler beim Registrieren.';
         errEl.style.display = 'block';
+    }
+}
+
+async function removeChannel(channelId, channelName) {
+    if (!confirm(`Kanal #${channelName} wirklich entfernen?`)) return;
+    const res = await apiDelete(`/api/channel/${channelId}`);
+    if (res?.success) {
+        location.reload();
+    } else {
+        alert(res?.error ?? 'Fehler beim Entfernen.');
     }
 }
 
