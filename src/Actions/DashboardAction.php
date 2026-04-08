@@ -38,8 +38,7 @@ class DashboardAction
             [$session['discord_user_id']]
         );
 
-        $heartbeat = $this->db->fetchOne('SELECT last_seen FROM bot_status LIMIT 1');
-        $botOnline = $heartbeat && strtotime($heartbeat['last_seen']) > time() - 180;
+        $botOnline = $request->getAttribute('bot_online');
 
         $inviteUrl = 'https://discord.com/oauth2/authorize?' . http_build_query([
             'client_id'   => Config::require('DISCORD_CLIENT_ID'),

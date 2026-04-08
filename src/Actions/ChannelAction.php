@@ -48,12 +48,13 @@ class ChannelAction
         unset($cat);
 
         return render('channel', [
-            'title'         => $channel['guild_name'] ?? 'Kanal-Konfiguration',
-            'session'       => $session,
-            'csrfToken'     => $csrfToken,
-            'channel'       => $channel,
-            'categories'    => $categories,
+            'title'          => $channel['guild_name'] ?? 'Kanal-Konfiguration',
+            'session'        => $session,
+            'csrfToken'      => $csrfToken,
+            'channel'        => $channel,
+            'categories'     => $categories,
             'hasCustomToken' => !empty($channel['custom_bot_token_encrypted']),
+            'botOnline'      => $request->getAttribute('bot_online'),
         ]);
     }
 }

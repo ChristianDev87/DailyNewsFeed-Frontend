@@ -41,6 +41,7 @@ class AdminAction
             'session'        => $session,
             'csrfToken'      => $csrfToken,
             'isSuperAdmin'   => true,
+            'botOnline'      => $request->getAttribute('bot_online'),
             'recentCommands' => $recentCommands,
             'stats'          => $stats,
         ]);

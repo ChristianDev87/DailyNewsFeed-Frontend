@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Middleware;
 
 use App\Auth;
+use App\Database;
 use App\Discord;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -14,8 +15,9 @@ use Slim\Psr7\Response;
 class AuthMiddleware implements MiddlewareInterface
 {
     public function __construct(
-        private Auth    $auth,
-        private Discord $discord
+        private Auth     $auth,
+        private Discord  $discord,
+        private Database $db
     ) {}
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
@@ -61,12 +63,16 @@ class AuthMiddleware implements MiddlewareInterface
             }
         }
 
+        $heartbeat = $this->db->fetchOne('SELECT last_seen FROM bot_status LIMIT 1');
+        $botOnline = $heartbeat && strtotime($heartbeat['last_seen']) > time() - 180;
+
         return $handler->handle(
             $request
                 ->withAttribute('session', $session)
                 ->withAttribute('session_token', $sessionToken)
                 ->withAttribute('csrf_token', $csrfToken)
                 ->withAttribute('is_superadmin', $this->auth->isSuperAdmin($session['discord_user_id']))
+                ->withAttribute('bot_online', $botOnline)
         );
     }
 
