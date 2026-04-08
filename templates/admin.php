@@ -47,6 +47,7 @@
         <tr>
             <th>#</th>
             <th>Befehl</th>
+            <th>Von</th>
             <th>Status</th>
             <th>Erstellt</th>
             <th>Ausgeführt</th>
@@ -57,6 +58,7 @@
         <tr>
             <td><?= (int)$cmd['id'] ?></td>
             <td><code><?= htmlspecialchars($cmd['command'], ENT_QUOTES) ?></code></td>
+            <td><?= $cmd['created_by'] === 'scheduler' ? '🕐 Scheduler' : '👤 Admin' ?></td>
             <td>
                 <span class="status-badge status-<?= htmlspecialchars($cmd['status'], ENT_QUOTES) ?>">
                     <?= match($cmd['status']) {
