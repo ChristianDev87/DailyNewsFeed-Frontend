@@ -69,6 +69,16 @@ class Discord
         return isset($result['user']) ? $result : null;
     }
 
+    public function getGuildChannels(string $guildId): array
+    {
+        $result = $this->get("/guilds/$guildId/channels", 'Bot ' . Config::require('DISCORD_BOT_TOKEN'));
+        if (!is_array($result) || isset($result['code'])) {
+            return [];
+        }
+        // Nur Text-Kanäle (type 0 = GUILD_TEXT)
+        return array_values(array_filter($result, fn($ch) => ($ch['type'] ?? -1) === 0));
+    }
+
     public function buildAuthUrl(string $state): string
     {
         return 'https://discord.com/oauth2/authorize?' . http_build_query([
