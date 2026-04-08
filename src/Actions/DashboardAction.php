@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Actions;
 
+use App\Config;
 use App\Database;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -12,6 +13,9 @@ use function App\render;
 
 class DashboardAction
 {
+    // VIEW_CHANNEL | SEND_MESSAGES | READ_MESSAGE_HISTORY | CREATE_PUBLIC_THREADS | SEND_MESSAGES_IN_THREADS
+    private const BOT_PERMISSIONS = '309237711920';
+
     public function __construct(private Database $db) {}
 
     public function __invoke(ServerRequestInterface $request, Response $response): ResponseInterface
@@ -41,6 +45,12 @@ class DashboardAction
             );
         }
 
+        $inviteUrl = 'https://discord.com/oauth2/authorize?' . http_build_query([
+            'client_id'   => Config::require('DISCORD_CLIENT_ID'),
+            'permissions' => self::BOT_PERMISSIONS,
+            'scope'       => 'bot applications.commands',
+        ]);
+
         return render('dashboard', [
             'title'        => 'Dashboard',
             'session'      => $session,
@@ -48,6 +58,7 @@ class DashboardAction
             'channels'     => $channels,
             'isSuperAdmin' => $isSuperAdmin,
             'botStatus'    => $botStatus,
+            'inviteUrl'    => $inviteUrl,
         ]);
     }
 }

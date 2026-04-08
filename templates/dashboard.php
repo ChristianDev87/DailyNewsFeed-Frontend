@@ -4,6 +4,7 @@
  * @var bool       $isSuperAdmin
  * @var array|null $botStatus
  * @var string     $csrfToken
+ * @var string     $inviteUrl
  */
 ?>
 <h1>Dashboard</h1>
@@ -36,7 +37,10 @@ async function botCmd(command) {
 
 <div class="section-header">
     <h2>Meine Kanäle</h2>
-    <button class="btn btn-primary btn-sm" onclick="toggleAddChannel()">+ Kanal hinzufügen</button>
+    <div style="display:flex;gap:8px">
+        <a href="<?= htmlspecialchars($inviteUrl, ENT_QUOTES) ?>" target="_blank" rel="noopener" class="btn btn-discord btn-sm">🤖 Bot einladen</a>
+        <button class="btn btn-primary btn-sm" onclick="toggleAddChannel()">+ Kanal hinzufügen</button>
+    </div>
 </div>
 
 <div id="add-channel-form" class="add-channel-panel" style="display:none">
