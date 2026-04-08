@@ -20,7 +20,11 @@ $chId = htmlspecialchars($channel['channel_id'], ENT_QUOTES);
             <strong><?= htmlspecialchars($cat['label'], ENT_QUOTES) ?></strong>
             <span style="color:var(--muted);font-size:13px;margin-left:8px">(<?= htmlspecialchars((string)count($cat['feeds']), ENT_QUOTES) ?> Feeds)</span>
         </span>
-        <span style="color:var(--muted)">▼</span>
+        <span style="display:flex;align-items:center;gap:8px">
+            <button class="btn btn-danger" style="padding:3px 9px;font-size:12px"
+                onclick="deleteCategory(<?= (int)$cat['id'] ?>, event)">✕</button>
+            <span style="color:var(--muted)">▼</span>
+        </span>
     </div>
     <div class="accordion-body">
         <div id="feeds-<?= (int)$cat['id'] ?>">

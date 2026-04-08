@@ -30,12 +30,12 @@ class ChannelRegisterAction
             return $this->json($response, ['success' => false, 'error' => 'Pflichtfelder fehlen'], 400);
         }
 
-        // Prüfen ob Kanal bereits registriert
+        // Prüfen ob Kanal bereits registriert (aktiv oder soft-gelöscht)
         $existing = $this->db->fetchOne(
-            'SELECT channel_id FROM channels WHERE channel_id = ?',
+            'SELECT channel_id, active FROM channels WHERE channel_id = ?',
             [$channelId]
         );
-        if ($existing) {
+        if ($existing && (int)$existing['active'] === 1) {
             return $this->json($response, ['success' => false, 'error' => 'Kanal ist bereits registriert'], 409);
         }
 
@@ -49,11 +49,19 @@ class ChannelRegisterAction
             ], 422);
         }
 
-        $this->db->execute(
-            'INSERT INTO channels (channel_id, guild_id, guild_name, channel_name, owner_user_id, active, created_at)
-             VALUES (?, ?, ?, ?, ?, 1, NOW())',
-            [$channelId, $guildId, $guildName, $channelName, $session['discord_user_id']]
-        );
+        if ($existing) {
+            // Kanal war gelöscht — reaktivieren
+            $this->db->execute(
+                'UPDATE channels SET active = 1, owner_user_id = ?, guild_name = ?, channel_name = ? WHERE channel_id = ?',
+                [$session['discord_user_id'], $guildName, $channelName, $channelId]
+            );
+        } else {
+            $this->db->execute(
+                'INSERT INTO channels (channel_id, guild_id, guild_name, channel_name, owner_user_id, active, created_at)
+                 VALUES (?, ?, ?, ?, ?, 1, NOW())',
+                [$channelId, $guildId, $guildName, $channelName, $session['discord_user_id']]
+            );
+        }
 
         return $this->json($response, ['success' => true]);
     }

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 use App\Actions\Auth\CallbackAction;
 use App\Actions\Api\BotCommandAction;
+use App\Actions\Api\CategoryDeleteAction;
 use App\Actions\Api\CategoryOrderAction;
 use App\Actions\Api\CategorySaveAction;
 use App\Actions\Api\ChannelDeleteAction;
@@ -68,6 +69,7 @@ $app->group('', function (\Slim\Routing\RouteCollectorProxy $group) {
     $group->delete('/api/feed/{id}', FeedDeleteAction::class);
     $group->post('/api/category/save', CategorySaveAction::class);
     $group->post('/api/category/order', CategoryOrderAction::class);
+    $group->delete('/api/category/{id}', CategoryDeleteAction::class);
     $group->post('/api/bot/command', BotCommandAction::class);
     $group->get('/api/guilds', GuildListAction::class);
     $group->get('/api/guilds/{guild_id}/channels', GuildChannelsAction::class);

@@ -51,6 +51,15 @@ async function deleteFeed(id, rowEl) {
     if (data.success) rowEl.remove();
 }
 
+// Kategorie löschen (wird von channel.php aufgerufen)
+async function deleteCategory(id, e) {
+    e.stopPropagation();
+    if (!confirm('Kategorie und alle zugehörigen Feeds löschen?')) return;
+    const data = await apiDelete(`/api/category/${id}`);
+    if (data.success) document.querySelector(`.accordion[data-cat-id="${id}"]`).remove();
+    else alert('Fehler: ' + (data.error ?? 'Unbekannt'));
+}
+
 // XSS-sicheres Einfügen von Strings in DOM
 function escHtml(str) {
     return str
