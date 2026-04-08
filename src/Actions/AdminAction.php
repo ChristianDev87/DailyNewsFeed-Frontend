@@ -24,7 +24,9 @@ class AdminAction
         $session   = $request->getAttribute('session');
         $csrfToken = $request->getAttribute('csrf_token');
 
-        $perPage     = 20;
+        $allowed     = [5, 10, 15, 20, 50, 100];
+        $perPage     = (int)($request->getQueryParams()['per_page'] ?? 20);
+        $perPage     = in_array($perPage, $allowed, true) ? $perPage : 20;
         $page        = max(1, (int)($request->getQueryParams()['page'] ?? 1));
         $offset      = ($page - 1) * $perPage;
         $totalCmds   = (int)$this->db->fetchOne('SELECT COUNT(*) AS n FROM bot_commands')['n'];
@@ -52,6 +54,7 @@ class AdminAction
             'commands'     => $commands,
             'stats'        => $stats,
             'page'         => $page,
+            'perPage'      => $perPage,
             'totalPages'   => $totalPages,
             'totalCmds'    => $totalCmds,
         ]);

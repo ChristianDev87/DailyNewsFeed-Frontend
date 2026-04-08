@@ -4,6 +4,7 @@
  * @var array  $commands
  * @var string $csrfToken
  * @var int    $page
+ * @var int    $perPage
  * @var int    $totalPages
  * @var int    $totalCmds
  */
@@ -83,21 +84,38 @@
 </table>
 </div>
 
-<?php if ($totalPages > 1): ?>
 <div class="pagination">
-    <?php if ($page > 1): ?>
-        <a href="/admin?page=<?= $page - 1 ?>" class="btn btn-ghost btn-sm">← Zurück</a>
-    <?php endif; ?>
-    <span class="page-info">Seite <?= $page ?> / <?= $totalPages ?></span>
-    <?php if ($page < $totalPages): ?>
-        <a href="/admin?page=<?= $page + 1 ?>" class="btn btn-ghost btn-sm">Weiter →</a>
+    <div class="pagination-left">
+        <label style="font-size:13px;color:var(--muted)">Einträge pro Seite:</label>
+        <select class="per-page-select" onchange="changePerPage(this.value)">
+            <?php foreach ([5, 10, 15, 20, 50, 100] as $opt): ?>
+                <option value="<?= $opt ?>" <?= $opt === $perPage ? 'selected' : '' ?>><?= $opt ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <?php if ($totalPages > 1): ?>
+    <div class="pagination-right">
+        <?php if ($page > 1): ?>
+            <a href="/admin?page=<?= $page - 1 ?>&per_page=<?= $perPage ?>" class="btn btn-ghost btn-sm">← Zurück</a>
+        <?php endif; ?>
+        <span class="page-info">Seite <?= $page ?> / <?= $totalPages ?></span>
+        <?php if ($page < $totalPages): ?>
+            <a href="/admin?page=<?= $page + 1 ?>&per_page=<?= $perPage ?>" class="btn btn-ghost btn-sm">Weiter →</a>
+        <?php endif; ?>
+    </div>
     <?php endif; ?>
 </div>
-<?php endif; ?>
 
 <?php endif; ?>
 
 <script>
+function changePerPage(val) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('per_page', val);
+    url.searchParams.set('page', '1');
+    window.location.href = url.toString();
+}
+
 async function botCmd(command) {
     const msgEl = document.getElementById('bot-msg');
     msgEl.textContent = 'Sende…';

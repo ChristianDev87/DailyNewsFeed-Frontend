@@ -236,3 +236,23 @@ input:focus { outline: 2px solid var(--accent); border-color: transparent; }
     margin-top: 16px;
 }
 .page-info { font-size: 13px; color: var(--muted); }
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.pagination-left { display: flex; align-items: center; gap: 8px; }
+.pagination-right { display: flex; align-items: center; gap: 8px; }
+.per-page-select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: inherit;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 13px;
+    cursor: pointer;
+}
