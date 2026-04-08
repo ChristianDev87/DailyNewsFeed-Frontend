@@ -142,3 +142,16 @@ CREATE TABLE IF NOT EXISTS bot_commands (
     INDEX idx_status  (status),
     INDEX idx_created (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- -----------------------------------------------------------------------------
+-- known_guilds
+-- Vom Bot automatisch befüllte Liste aller Server auf denen er aktiv ist.
+-- -----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS known_guilds (
+    guild_id    VARCHAR(32)  NOT NULL,
+    guild_name  VARCHAR(255) NOT NULL,
+    active      TINYINT(1)   NOT NULL DEFAULT 1,
+    joined_at   DATETIME     NOT NULL,
+    updated_at  DATETIME     NOT NULL,
+    PRIMARY KEY (guild_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

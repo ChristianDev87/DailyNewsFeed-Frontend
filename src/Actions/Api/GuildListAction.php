@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Api;
 
+use App\Database;
 use App\Discord;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -10,7 +11,10 @@ use Slim\Psr7\Response;
 
 class GuildListAction
 {
-    public function __construct(private Discord $discord) {}
+    public function __construct(
+        private Discord  $discord,
+        private Database $db
+    ) {}
 
     public function __invoke(ServerRequestInterface $request, Response $response): ResponseInterface
     {
@@ -23,10 +27,10 @@ class GuildListAction
             return ($g['owner'] ?? false) || ($perms & 0x8) || ($perms & 0x20);
         });
 
-        // Nur Server wo der Bot auch ist
-        $botGuilds  = $this->discord->getBotGuilds();
-        $botGuildIds = array_column($botGuilds, 'id');
-        $filtered = array_values(array_filter($filtered, fn($g) => in_array($g['id'], $botGuildIds, true)));
+        // Bot-Guilds aus DB (statt Discord API-Call)
+        $botGuilds   = $this->db->fetchAll('SELECT guild_id FROM known_guilds WHERE active = 1');
+        $botGuildIds = array_column($botGuilds, 'guild_id');
+        $filtered    = array_values(array_filter($filtered, fn($g) => in_array($g['id'], $botGuildIds, true)));
 
         $result = array_map(fn($g) => [
             'id'   => $g['id'],
