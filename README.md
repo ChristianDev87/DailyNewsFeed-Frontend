@@ -162,3 +162,8 @@ certbot --apache -d deine-domain.de
 - **Templating:** PHP-Templates (kein Twig)
 - **Auth:** Discord OAuth2, Sliding Sessions (DB-backed)
 - **CSRF:** HMAC-SHA256 (stateless, abgeleitet aus Session-Token)
+
+## Geplant
+
+- **Docker** — alle drei Komponenten (Frontend, Bot, Watchdog) sollen in einem gemeinsamen Docker-Setup laufen (`docker-compose` mit internem Netzwerk, kein offener DB-Port nach außen)
+- **Benutzer-Zeitzone** — Digest-Zeiten pro Kanal konfigurierbar statt global
